@@ -324,7 +324,7 @@ class NetworkSession{
 		$ev = new SessionPingUpdateEvent($this, $ping);
 		$ev->call();
 
-		$this->ping = $ev->getPing();
+		$this->ping = (int) $ev->getPing();
 	}
 
 	public function getHandler() : ?PacketHandler{
