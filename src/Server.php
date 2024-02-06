@@ -1230,9 +1230,9 @@ class Server{
 		$useQuery = $this->configGroup->getConfigBool(ServerProperties::ENABLE_QUERY, true);
 
 		$typeConverter = TypeConverter::getInstance();
-		$this->packetSerializerContext = $packetSerializerContext = new PacketSerializerContext($typeConverter->getItemTypeDictionary());
-		$this->packetBroadcaster = $packetBroadcaster = new StandardPacketBroadcaster($this, $packetSerializerContext);
-		$this->entityEventBroadcaster = $entityEventBroadcaster = new StandardEntityEventBroadcaster($packetBroadcaster, $typeConverter);
+		$packetSerializerContext = $this->getPacketSerializerContext($typeConverter);
+		$packetBroadcaster = $this->getPacketBroadcaster($packetSerializerContext);
+		$entityEventBroadcaster = $this->getEntityEventBroadcaster($packetBroadcaster, $typeConverter);
 
 		if(
 			!$this->startupPrepareConnectableNetworkInterfaces($this->getIp(), $this->getPort(), false, $useQuery, $packetBroadcaster, $entityEventBroadcaster, $packetSerializerContext, $typeConverter) ||
@@ -1888,15 +1888,15 @@ class Server{
 		return $this->waterdogeSupport;
 	}
 
-	public function getPacketSerializerContext() : PacketSerializerContext {
-		return $this->packetSerializerContext;
+	public function getPacketSerializerContext(TypeConverter $typeConverter) : PacketSerializerContext {
+		return $this->packetSerializerContext ??= new PacketSerializerContext($typeConverter->getItemTypeDictionary());
 	}
 
-	public function getEntityEventBroadcaster() : EntityEventBroadcaster {
-		return $this->entityEventBroadcaster;
+	public function getEntityEventBroadcaster(PacketBroadcaster $packetBroadcaster, TypeConverter $typeConverter) : EntityEventBroadcaster {
+		return $this->entityEventBroadcaster ??= new StandardEntityEventBroadcaster($packetBroadcaster, $typeConverter);
 	}
 
-	public function getPacketBroadcaster() : PacketBroadcaster {
-		return $this->packetBroadcaster;
+	public function getPacketBroadcaster(PacketSerializerContext $packetSerializerContext) : PacketBroadcaster {
+		return $this->packetBroadcaster ??= new StandardPacketBroadcaster($this, $packetSerializerContext);
 	}
 }
