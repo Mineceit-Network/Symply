@@ -303,6 +303,9 @@ class Server{
 	private array $broadcastSubscribers = [];
 
 	private bool $waterdogeSupport = false;
+	private PacketSerializerContext $packetSerializerContext;
+	private PacketBroadcaster $packetBroadcaster;
+	private EntityEventBroadcaster $entityEventBroadcaster;
 
 	public function getName() : string{
 		return VersionInfo::NAME;
@@ -1227,9 +1230,9 @@ class Server{
 		$useQuery = $this->configGroup->getConfigBool(ServerProperties::ENABLE_QUERY, true);
 
 		$typeConverter = TypeConverter::getInstance();
-		$packetSerializerContext = new PacketSerializerContext($typeConverter->getItemTypeDictionary());
-		$packetBroadcaster = new StandardPacketBroadcaster($this, $packetSerializerContext);
-		$entityEventBroadcaster = new StandardEntityEventBroadcaster($packetBroadcaster, $typeConverter);
+		$this->packetSerializerContext = $packetSerializerContext = new PacketSerializerContext($typeConverter->getItemTypeDictionary());
+		$this->packetBroadcaster = $packetBroadcaster = new StandardPacketBroadcaster($this, $packetSerializerContext);
+		$this->entityEventBroadcaster = $entityEventBroadcaster = new StandardEntityEventBroadcaster($packetBroadcaster, $typeConverter);
 
 		if(
 			!$this->startupPrepareConnectableNetworkInterfaces($this->getIp(), $this->getPort(), false, $useQuery, $packetBroadcaster, $entityEventBroadcaster, $packetSerializerContext, $typeConverter) ||
@@ -1883,5 +1886,17 @@ class Server{
 	public function isWaterdogepeSupport() : bool
 	{
 		return $this->waterdogeSupport;
+	}
+
+	public function getPacketSerializerContext() : PacketSerializerContext {
+		return $this->packetSerializerContext;
+	}
+
+	public function getEntityEventBroadcaster() : EntityEventBroadcaster {
+		return $this->entityEventBroadcaster;
+	}
+
+	public function getPacketBroadcaster() : PacketBroadcaster {
+		return $this->packetBroadcaster;
 	}
 }
