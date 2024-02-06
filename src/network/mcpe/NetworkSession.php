@@ -321,9 +321,10 @@ class NetworkSession{
 	 * @internal Called by the network interface to update last recorded ping measurements.
 	 */
 	public function updatePing(int $ping) : void{
-		$this->ping = $ping;
 		$ev = new SessionPingUpdateEvent($this, $ping);
 		$ev->call();
+
+		$this->ping = $ev->getPing();
 	}
 
 	public function getHandler() : ?PacketHandler{
