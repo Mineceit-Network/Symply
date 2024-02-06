@@ -45,4 +45,9 @@ class SessionPingUpdateEvent extends Event
 	{
 		return $this->ping;
 	}
+
+	public function setPing(float $ping) : void
+	{
+		$this->ping = $ping;
+	}
 }
